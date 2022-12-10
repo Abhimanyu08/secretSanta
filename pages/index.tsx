@@ -93,7 +93,7 @@ const Home: NextPage = () => {
 			style={{ backgroundImage: `url(${bgImage.src})` }}
 		>
 			{!createdOrJoined && (
-				<div className="flex  h-fit gap-5 items-center text-lg font-semibold text-amber-400 tracking-wide">
+				<div className="flex flex-col md:flex-row  h-fit gap-5 items-center text-lg font-semibold text-amber-400 tracking-wide">
 					{roomId ? (
 						<span>Enter your name to join room: </span>
 					) : (
@@ -127,7 +127,7 @@ const Home: NextPage = () => {
 			)}
 			{participants.length > 0 && (
 				<div className="flex flex-col grow justify-center items-center gap-10">
-					<div className="flex w-full gap-10 justify-center text-center items-end my-5 relative">
+					<div className="flex flex-col md:flex-row w-full gap-10 justify-center text-center items-end my-5 relative">
 						{participants.map((val, idx) => (
 							<span
 								className={`${
@@ -205,7 +205,7 @@ const Home: NextPage = () => {
 				</div>
 			)}
 			{roomLink !== "" && (
-				<div className="flex mb-10">
+				<div className="flex mb-10 flex-col md:flex-row">
 					<span className="bg-gradient-to-tr from-red-500 to-amber-500 p-2 rounded-l-md">
 						Room Link:{" "}
 					</span>
