@@ -189,8 +189,8 @@ const Home: NextPage = () => {
 					{allotingSanta && (
 						<Image
 							src={decidingSanta.src}
-							height={100}
-							width={100}
+							height={300}
+							width={400}
 							alt="deciding santa"
 						/>
 					)}
