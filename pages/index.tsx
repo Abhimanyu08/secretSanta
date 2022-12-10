@@ -1,86 +1,221 @@
-import type { NextPage } from 'next'
-import Head from 'next/head'
-import Image from 'next/image'
-
+import type { NextPage } from "next";
+import { useRouter } from "next/router";
+import { useContext, useEffect, useState } from "react";
+import { roasts } from "../utils/roasts";
+import { SocketContext } from "./_app";
+import roomNameGenerator from "../utils/getRoomName";
+import bgImage from "../public/bg.jpg";
+import decidingSanta from "../public/deciding-santa.gif";
+import finalSanta from "../public/final-santa.gif";
+import Image from "next/image";
 const Home: NextPage = () => {
-  return (
-    <div className="flex min-h-screen flex-col items-center justify-center py-2">
-      <Head>
-        <title>Create Next App</title>
-        <link rel="icon" href="/favicon.ico" />
-      </Head>
+	const router = useRouter();
 
-      <main className="flex w-full flex-1 flex-col items-center justify-center px-20 text-center">
-        <h1 className="text-6xl font-bold">
-          Welcome to{' '}
-          <a className="text-blue-600" href="https://nextjs.org">
-            Next.js!
-          </a>
-        </h1>
+	const { roomId } = router.query;
+	const { socket, participants, santa, setSanta } = useContext(SocketContext);
+	const [name, setName] = useState("");
+	const [roomLink, setRoomLink] = useState("");
+	const [room, setRoom] = useState("");
+	const [createdOrJoined, setCreatedOrJoined] = useState(false);
+	const [allotingSanta, setAllotingSanta] = useState(false);
+	const [allotAgainRequesters, setAllotAgainRequesters] = useState<
+		Record<string, string>
+	>({});
 
-        <p className="mt-3 text-2xl">
-          Get started by editing{' '}
-          <code className="rounded-md bg-gray-100 p-3 font-mono text-lg">
-            pages/index.tsx
-          </code>
-        </p>
+	useEffect(() => {
+		if (socket) {
+			socket?.on(
+				"allotRequest",
+				(val: { requestee: string; comment: string }) => {
+					setAllotAgainRequesters((prev) => ({
+						...prev,
+						[val.requestee]: val.comment,
+					}));
+				}
+			);
+			socket.on("allotingSanta", () => {
+				setSanta("");
+				setAllotingSanta(true);
+			});
+		}
+		// return () => {
+		// 	socket?.emit("destroyRoom");
+		// };
+	}, [socket]);
 
-        <div className="mt-6 flex max-w-4xl flex-wrap items-center justify-around sm:w-full">
-          <a
-            href="https://nextjs.org/docs"
-            className="mt-6 w-96 rounded-xl border p-6 text-left hover:text-blue-600 focus:text-blue-600"
-          >
-            <h3 className="text-2xl font-bold">Documentation &rarr;</h3>
-            <p className="mt-4 text-xl">
-              Find in-depth information about Next.js features and its API.
-            </p>
-          </a>
+	useEffect(() => {
+		if (roomId) setRoom(roomId as string);
+	}, [roomId]);
 
-          <a
-            href="https://nextjs.org/learn"
-            className="mt-6 w-96 rounded-xl border p-6 text-left hover:text-blue-600 focus:text-blue-600"
-          >
-            <h3 className="text-2xl font-bold">Learn &rarr;</h3>
-            <p className="mt-4 text-xl">
-              Learn about Next.js in an interactive course with quizzes!
-            </p>
-          </a>
+	useEffect(() => {
+		if (santa) {
+			setAllotAgainRequesters({});
+			setAllotingSanta(false);
+		}
+	}, [santa]);
 
-          <a
-            href="https://github.com/vercel/next.js/tree/canary/examples"
-            className="mt-6 w-96 rounded-xl border p-6 text-left hover:text-blue-600 focus:text-blue-600"
-          >
-            <h3 className="text-2xl font-bold">Examples &rarr;</h3>
-            <p className="mt-4 text-xl">
-              Discover and deploy boilerplate example Next.js projects.
-            </p>
-          </a>
+	const onCreateRoom = () => {
+		if (!name) {
+			alert("please enter a name");
+			return;
+		}
+		if (roomId) {
+			socket?.emit("joinRoom", roomId, name);
+			setCreatedOrJoined(true);
+			return;
+		}
 
-          <a
-            href="https://vercel.com/import?filter=next.js&utm_source=create-next-app&utm_medium=default-template&utm_campaign=create-next-app"
-            className="mt-6 w-96 rounded-xl border p-6 text-left hover:text-blue-600 focus:text-blue-600"
-          >
-            <h3 className="text-2xl font-bold">Deploy &rarr;</h3>
-            <p className="mt-4 text-xl">
-              Instantly deploy your Next.js site to a public URL with Vercel.
-            </p>
-          </a>
-        </div>
-      </main>
+		const roomName = roomNameGenerator();
+		setRoom(roomName);
+		socket?.emit("createRoom", roomName, name);
+		const link =
+			window.location.hostname === "localhost"
+				? `${window.location.protocol}//${window.location.hostname}:3000?roomId=${roomName}`
+				: `${window.location.protocol}//${window.location.hostname}?roomId=${roomName}`;
+		setRoomLink(link);
+		setCreatedOrJoined(true);
+	};
 
-      <footer className="flex h-24 w-full items-center justify-center border-t">
-        <a
-          className="flex items-center justify-center gap-2"
-          href="https://vercel.com?utm_source=create-next-app&utm_medium=default-template&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Powered by{' '}
-          <Image src="/vercel.svg" alt="Vercel Logo" width={72} height={16} />
-        </a>
-      </footer>
-    </div>
-  )
-}
+	const onAllotSanta = (room: string) => {
+		setSanta("");
+		setAllotingSanta(true);
+		socket?.emit("getSecretSanta", room);
+	};
 
-export default Home
+	const allotAgain = (room: string) => {
+		const comment = roasts.at(Math.floor(Math.random() * roasts.length));
+		socket?.emit("getSecretSantaAgain", room, comment);
+	};
+
+	return (
+		<div
+			className="flex flex-col h-screen w-screen  items-center justify-center bg-cover"
+			style={{ backgroundImage: `url(${bgImage.src})` }}
+		>
+			{!createdOrJoined && (
+				<div className="flex  h-fit gap-5 items-center text-lg font-semibold text-amber-400 tracking-wide">
+					{roomId ? (
+						<span>Enter your name to join room: </span>
+					) : (
+						<span>Enter your name to create room: </span>
+					)}
+					<input
+						type="text"
+						name=""
+						id=""
+						value={name}
+						className=" bg-white rounded-md h-10 text-black p-2 font-mono w-64"
+						onChange={(e) => setName(e.target.value)}
+					/>
+				</div>
+			)}
+			{roomId === undefined && !createdOrJoined && (
+				<div
+					className="rounded-md p-2 text-black bg-amber-400 mt-10 font-bold cursor-pointer"
+					onClick={onCreateRoom}
+				>
+					Create Room
+				</div>
+			)}
+			{typeof roomId === "string" && !createdOrJoined && (
+				<div
+					className="rounded-md p-2 bg-amber-400 text-black mt-10 font-bold cursor-pointer"
+					onClick={onCreateRoom}
+				>
+					Join Room
+				</div>
+			)}
+			{participants.length > 0 && (
+				<div className="flex flex-col grow justify-center items-center gap-10">
+					<div className="flex w-full gap-10 justify-center text-center items-end my-5 relative">
+						{participants.map((val, idx) => (
+							<span
+								className={`${
+									idx % 2 === 0
+										? "tooltip-top"
+										: "tooltip-bottom"
+								} ${
+									Object.hasOwn(allotAgainRequesters, val)
+										? "  tooltip tooltip-open"
+										: ""
+								}`}
+								data-tip={allotAgainRequesters[val]}
+							>
+								<button className="text-2xl">🧝‍♂️</button>
+								{val}
+							</span>
+						))}
+					</div>
+					<span
+						className={`items-center text-xl font-semibold flex gap-2 ${
+							participants.at(0) === name ? "" : "hidden"
+						}`}
+					>
+						{santa ? (
+							<span>
+								Don't want to gift anything to {santa} ? Allot
+								again
+							</span>
+						) : (
+							<span>Allot Secret Santas </span>
+						)}
+						<div
+							className={`text-3xl cursor-pointer rounded-md ${
+								santa || allotingSanta ? "" : "animate-pulse"
+							} ${allotingSanta ? "animate-spin" : ""}`}
+							onClick={() => onAllotSanta(room)}
+						>
+							🎲
+						</div>
+					</span>
+					{roomId && santa && (
+						<span className="font-semibold">
+							Don't want to gift anything to {santa}?
+							<span
+								className="px-2 py-1 bg-amber-400 rounded-md m-2 font-bold cursor-pointer"
+								onClick={() => allotAgain(room)}
+							>
+								Ask
+							</span>
+							room owner to allot again
+						</span>
+					)}
+					{santa && (
+						<span className="text-xl">
+							You are secret santa for: 🧝‍♂️
+							<span>{santa}</span>
+						</span>
+					)}
+					{allotingSanta && (
+						<Image
+							src={decidingSanta.src}
+							height={100}
+							width={100}
+							alt="deciding santa"
+						/>
+					)}
+					{santa && (
+						<Image
+							src={finalSanta.src}
+							height={200}
+							width={300}
+							alt="final santa"
+						/>
+					)}
+				</div>
+			)}
+			{roomLink !== "" && (
+				<div className="flex mb-10">
+					<span className="bg-gradient-to-tr from-red-500 to-amber-500 p-2 rounded-l-md">
+						Room Link:{" "}
+					</span>
+					<span className="bg-white select-all p-2 rounded-r-md">
+						{roomLink}
+					</span>
+				</div>
+			)}
+		</div>
+	);
+};
+
+export default Home;
