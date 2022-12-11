@@ -28,10 +28,7 @@ const Home: NextPage = () => {
 	useEffect(() => {
 		if (socket === undefined) {
 			const newSocket = io(
-				"https://Secret-Santa-Server.abhimanyu08.repl.co",
-				{
-					transports: ["websocket"],
-				}
+				"https://Secret-Santa-Server.abhimanyu08.repl.co"
 			);
 
 			newSocket.on("joined", (val: { members: string[] }) => {
