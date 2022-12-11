@@ -126,7 +126,7 @@ const Home: NextPage = () => {
 				</div>
 			)}
 			{participants.length > 0 && (
-				<div className="flex flex-col grow justify-center items-center gap-10 overflow-y-auto">
+				<div className="flex flex-col w-full grow justify-center items-center gap-10 overflow-y-auto">
 					<div className="flex flex-col items-center md:flex-row w-full gap-10 justify-center text-center  my-5 relative">
 						{participants.map((val, idx) => (
 							<span
@@ -171,12 +171,12 @@ const Home: NextPage = () => {
 					{roomId && santa && (
 						<span className="font-semibold">
 							Don't want to gift anything to {santa}?
-							<span
-								className="px-2 py-1 bg-amber-400 rounded-md m-2 font-bold cursor-pointer"
+							<button
+								className="px-2 py-1 bg-amber-400 inline rounded-md m-2 font-bold cursor-pointer"
 								onClick={() => allotAgain(room)}
 							>
 								Ask
-							</span>
+							</button>
 							room owner to allot again
 						</span>
 					)}
