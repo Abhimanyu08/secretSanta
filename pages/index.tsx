@@ -27,23 +27,19 @@ const Home: NextPage = () => {
 
 	useEffect(() => {
 		if (socket === undefined) {
-			const newSocket = io(
-				"https://Secret-Santa-Server.abhimanyu08.repl.co",
-				{
-					transports: ["websocket"],
-				}
-			);
+			fetch("/api/socket").finally(() => {
+				const newSocket = io();
+				newSocket.on("joined", (val: { members: string[] }) => {
+					console.log(val);
+					setParticipants(val.members);
+				});
 
-			newSocket.on("joined", (val: { members: string[] }) => {
-				console.log(val);
-				setParticipants(val.members);
+				newSocket.on("santa", (name) => {
+					setSanta(name);
+				});
+
+				setSocket(newSocket);
 			});
-
-			newSocket.on("santa", (name) => {
-				setSanta(name);
-			});
-
-			setSocket(newSocket);
 		}
 	}, []);
 
