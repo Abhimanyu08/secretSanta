@@ -127,7 +127,7 @@ const Home: NextPage = () => {
 			)}
 			{participants.length > 0 && (
 				<div className="flex flex-col w-full grow justify-center items-center gap-10 overflow-y-auto">
-					<div className="flex flex-col items-center md:flex-row w-full gap-10 justify-center text-center  my-5 relative">
+					<div className="flex flex-col items-center md:flex-row w-full gap-16  justify-center text-center  my-5 relative">
 						{participants.map((val, idx) => (
 							<span
 								className={`${
