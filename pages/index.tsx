@@ -132,7 +132,7 @@ const Home: NextPage = () => {
 							<span
 								className={`${
 									idx % 2 === 0
-										? "tooltip-top"
+										? "tooltip-bottom lg:tooltip-top"
 										: "tooltip-bottom"
 								} ${
 									Object.hasOwn(allotAgainRequesters, val)
