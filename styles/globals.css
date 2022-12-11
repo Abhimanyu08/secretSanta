@@ -9,4 +9,5 @@ span {
 .tooltip::before {
 	background-color: black;
 	color: yellow;
+	width: 164px;
 }

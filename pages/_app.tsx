@@ -25,7 +25,7 @@ function MyApp({ Component, pageProps }: AppProps) {
 	useEffect(() => {
 		if (socket === undefined) {
 			const newSocket = io(
-				"https://BigheartedExhaustedGravity.abhimanyu08.repl.co",
+				"https://Secret-Santa-Server.abhimanyu08.repl.co",
 				{
 					transports: ["websocket"],
 				}
