@@ -126,8 +126,8 @@ const Home: NextPage = () => {
 				</div>
 			)}
 			{participants.length > 0 && (
-				<div className="flex flex-col grow justify-center items-center gap-10">
-					<div className="flex flex-col md:flex-row w-full gap-10 justify-center text-center items-end my-5 relative">
+				<div className="flex flex-col grow justify-center items-center gap-10 overflow-y-auto">
+					<div className="flex flex-col items-center md:flex-row w-full gap-10 justify-center text-center  my-5 relative">
 						{participants.map((val, idx) => (
 							<span
 								className={`${
@@ -147,7 +147,7 @@ const Home: NextPage = () => {
 						))}
 					</div>
 					<span
-						className={`items-center text-xl font-semibold flex gap-2 ${
+						className={`items-center text-xl px-4 font-semibold flex gap-2 ${
 							participants.at(0) === name ? "" : "hidden"
 						}`}
 					>
@@ -205,11 +205,11 @@ const Home: NextPage = () => {
 				</div>
 			)}
 			{roomLink !== "" && (
-				<div className="flex mb-10 flex-col md:flex-row">
-					<span className="bg-gradient-to-tr from-red-500 to-amber-500 p-2 rounded-l-md">
+				<div className="flex mb-10 flex-col w-52 md:w-fit md:flex-row gap-2 md:gap-0">
+					<span className="bg-gradient-to-tr rounded-r-md md:rounded-r-none from-red-500 to-amber-500 p-2 rounded-l-md">
 						Room Link:{" "}
 					</span>
-					<span className="bg-white select-all p-2 rounded-r-md">
+					<span className="bg-white select-all p-2 rounded-r-md rounded-l-md md:rounded-l-none break-words">
 						{roomLink}
 					</span>
 				</div>
