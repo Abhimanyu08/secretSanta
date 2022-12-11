@@ -89,7 +89,7 @@ const Home: NextPage = () => {
 
 	return (
 		<div
-			className="flex flex-col h-screen w-screen  items-center justify-center bg-cover"
+			className="flex flex-col min-h-screen w-screen  items-center justify-center bg-cover"
 			style={{ backgroundImage: `url(${bgImage.src})` }}
 		>
 			{!createdOrJoined && (
@@ -205,7 +205,7 @@ const Home: NextPage = () => {
 				</div>
 			)}
 			{roomLink !== "" && (
-				<div className="flex mb-10 flex-col w-52 md:w-fit md:flex-row gap-2 md:gap-0">
+				<div className="flex mb-10 mt-4 flex-col w-52 md:w-fit md:flex-row gap-2 md:gap-0">
 					<span className="bg-gradient-to-tr rounded-r-md md:rounded-r-none from-red-500 to-amber-500 p-2 rounded-l-md">
 						Room Link:{" "}
 					</span>
