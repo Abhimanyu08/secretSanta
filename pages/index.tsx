@@ -1,18 +1,21 @@
 import type { NextPage } from "next";
+import Image from "next/image";
 import { useRouter } from "next/router";
-import { useContext, useEffect, useState } from "react";
-import { roasts } from "../utils/roasts";
-import { SocketContext } from "./_app";
-import roomNameGenerator from "../utils/getRoomName";
+import { useEffect, useState } from "react";
+import { io, Socket } from "socket.io-client";
 import bgImage from "../public/bg.jpg";
 import decidingSanta from "../public/deciding-santa.gif";
 import finalSanta from "../public/final-santa.gif";
-import Image from "next/image";
+import roomNameGenerator from "../utils/getRoomName";
+import { roasts } from "../utils/roasts";
+
 const Home: NextPage = () => {
 	const router = useRouter();
 
 	const { roomId } = router.query;
-	const { socket, participants, santa, setSanta } = useContext(SocketContext);
+	const [socket, setSocket] = useState<Socket>();
+	const [participants, setParticipants] = useState<string[]>([]);
+	const [santa, setSanta] = useState("");
 	const [name, setName] = useState("");
 	const [roomLink, setRoomLink] = useState("");
 	const [room, setRoom] = useState("");
@@ -21,6 +24,28 @@ const Home: NextPage = () => {
 	const [allotAgainRequesters, setAllotAgainRequesters] = useState<
 		Record<string, string>
 	>({});
+
+	useEffect(() => {
+		if (socket === undefined) {
+			const newSocket = io(
+				"https://Secret-Santa-Server.abhimanyu08.repl.co",
+				{
+					transports: ["websocket"],
+				}
+			);
+
+			newSocket.on("joined", (val: { members: string[] }) => {
+				console.log(val);
+				setParticipants(val.members);
+			});
+
+			newSocket.on("santa", (name) => {
+				setSanta(name);
+			});
+
+			setSocket(newSocket);
+		}
+	}, []);
 
 	useEffect(() => {
 		if (socket) {
@@ -160,7 +185,7 @@ const Home: NextPage = () => {
 							<span>Allot Secret Santas </span>
 						)}
 						<div
-							className={`text-3xl cursor-pointer rounded-md ${
+							className={`text-3xl mt-3 cursor-pointer rounded-md ${
 								santa || allotingSanta ? "" : "animate-pulse"
 							} ${allotingSanta ? "animate-spin" : ""}`}
 							onClick={() => onAllotSanta(room)}
