@@ -179,7 +179,7 @@ const Home: NextPage = () => {
 					</div>
 					<span
 						className={`items-center text-xl px-4 font-semibold flex gap-2 ${
-							participants.at(0) === name ? "" : "hidden"
+							roomLink ? "" : "hidden"
 						}`}
 					>
 						{santa ? (
