@@ -60,14 +60,23 @@ const Home: NextPage = () => {
 				setAllotingSanta(true);
 			});
 		}
-		// return () => {
-		// 	socket?.emit("destroyRoom");
-		// };
 	}, [socket]);
 
 	useEffect(() => {
 		if (roomId) setRoom(roomId as string);
 	}, [roomId]);
+
+	useEffect(() => {
+		window.onbeforeunload = () => {
+			socket?.emit("destroyRoom", room);
+			socket?.close();
+		};
+		return () => {
+			if (room && socket) {
+				socket.emit("destroyRoom", room);
+			}
+		};
+	}, [room, socket]);
 
 	useEffect(() => {
 		if (santa) {
