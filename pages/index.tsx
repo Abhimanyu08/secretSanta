@@ -27,7 +27,11 @@ const Home: NextPage = () => {
 
 	useEffect(() => {
 		if (socket === undefined) {
-			fetch("/api/socket").finally(() => {
+			fetch(
+				window.location.hostname === "localhost"
+					? `${window.location.protocol}//${window.location.hostname}:3000/api/socket`
+					: `${window.location.protocol}//${window.location.hostname}/api/socket`
+			).finally(() => {
 				const newSocket = io();
 				newSocket.on("joined", (val: { members: string[] }) => {
 					console.log(val);
